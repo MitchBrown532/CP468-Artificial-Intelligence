@@ -101,4 +101,4 @@ print("===================Solution:===================")
 
 # 8X8 Grid of '-', replace with Q when queen is present on that cell
 for row in solution:
-    print("===================","".join([' Q ' if col == row else ' - ' for col in range(BOARD_SIZE)]), "===================") 
+    print("".join([' Q ' if col == row else ' - ' for col in range(BOARD_SIZE)])) 
