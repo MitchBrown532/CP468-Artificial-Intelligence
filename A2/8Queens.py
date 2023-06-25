@@ -34,12 +34,9 @@ def selection(population):
 
 def crossover(parent1, parent2):
     # Perform one-point crossover - is there a way to improve this by holding chunks of unconflicting queens? ex: 1st 3 rows are good, can we choose crossover point between 3 & 4?
-    #print("Crossing things over")
     crossover_point = random.randint(1, BOARD_SIZE-2)
     child1 = parent1[:crossover_point] + parent2[crossover_point:]
     child2 = parent2[:crossover_point] + parent1[crossover_point:]
-    #print("Parents: ", parent1, parent2)
-    #print("Children: ", child1, child2)
     return child1, child2
 
 def mutate(chromosome):
@@ -64,14 +61,15 @@ def genetic_algorithm():
         # Calculate fitness for each chromosome in the population
         for individual in population:
             individual['fitness'] = calculate_fitness(individual['chromosome'])
-
+        print("===================New Population:===================")
+        print(sorted(population, key=lambda x:x['fitness']))
         # Check termination condition - No threats
         print("===================Checking for solution...===================")
         best_fitness = min([individual['fitness'] for individual in population])
         if best_fitness == 0:
             print("===================Solution Found!!!===================")
             break
-        print("===================No solution found, eugenics commence===================")
+        print("===================No solution found :( commence eugenics ===================")
 
         # Perform selection
         print("===================Selecting parents:===================")
@@ -88,7 +86,6 @@ def genetic_algorithm():
         print("===================Breeding Complete. Boomer Replacement commencing:===================")
         # Replace old population with the new generation
         population = offspring
-        print(population)
         print("===================Boomer Replacement Complete.===================")
 
     # Extract the solution
@@ -98,7 +95,8 @@ def genetic_algorithm():
 # Run the genetic algorithm and print the solution
 solution = genetic_algorithm()
 print("===================Solution:===================")
-
+print("Chromosome: ", solution)
+print("Board: ")
 # 8X8 Grid of '-', replace with Q when queen is present on that cell
 for row in solution:
     print("".join([' Q ' if col == row else ' - ' for col in range(BOARD_SIZE)])) 
