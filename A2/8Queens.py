@@ -3,13 +3,14 @@ import random
 # Constants
 BOARD_SIZE = 8
 POPULATION_SIZE = 100
-MUTATION_RATE = 0.1
-MAX_GENERATIONS = 1000
+MUTATION_RATE = 0.3
+MAX_GENERATIONS = 404
 
 def generate_chromosome():
     # Generate a random chromosome - array of 8 random int within board size to represent Queen's position
-    chromosome = [random.randint(0, BOARD_SIZE-1) for _ in range(BOARD_SIZE)]
-    #print(chromosome)
+    #chromosome = [random.randint(0, BOARD_SIZE-1) for _ in range(BOARD_SIZE)]
+    chromosome = list(range(BOARD_SIZE))
+    random.shuffle(chromosome)
     return chromosome
 
 def calculate_fitness(chromosome):
@@ -29,7 +30,6 @@ def selection(population):
         tournament.sort(key=lambda x: x['fitness'])
         parents.append(tournament[0]['chromosome'])
 
-    print("New parents:", parents)
     return parents
 
 def crossover(parent1, parent2):
@@ -45,36 +45,25 @@ def mutate(chromosome):
     if random.random() < MUTATION_RATE:
         index = random.randint(0, BOARD_SIZE-1)
         mutated_chromosome[index] = random.randint(0, BOARD_SIZE-1)
-        print('MUTATION TIME!!!!')
-        print("Mutated chromosome: ", mutated_chromosome)
     return mutated_chromosome
 
 def genetic_algorithm():
-    print("===================Begin!!!===================")
+    generation = 0
     # Generate initial population
-    print("===================Popluating...===================")
     population = [{'chromosome': generate_chromosome(), 'fitness': 0} for _ in range(POPULATION_SIZE)]
-    print("===================Popluated.===================")
   
     # Main loop
     for generation in range(MAX_GENERATIONS):
         # Calculate fitness for each chromosome in the population
         for individual in population:
             individual['fitness'] = calculate_fitness(individual['chromosome'])
-        print("===================New Population:===================")
-        print(sorted(population, key=lambda x:x['fitness']))
         # Check termination condition - No threats
-        print("===================Checking for solution...===================")
         best_fitness = min([individual['fitness'] for individual in population])
         if best_fitness == 0:
-            print("===================Solution Found!!!===================")
             break
-        print("===================No solution found :( commence eugenics ===================")
 
         # Perform selection
-        print("===================Selecting parents:===================")
         parents = selection(population)
-        print("===================Parents selected. Begin Breeding:===================")
         # Create new generation
         offspring = []
         while len(offspring) < POPULATION_SIZE:
@@ -83,17 +72,20 @@ def genetic_algorithm():
             mutated_child1 = mutate(child1)
             mutated_child2 = mutate(child2)
             offspring.extend([{'chromosome': mutated_child1, 'fitness': 0}, {'chromosome': mutated_child2, 'fitness': 0}])
-        print("===================Breeding Complete. Boomer Replacement commencing:===================")
         # Replace old population with the new generation
         population = offspring
-        print("===================Boomer Replacement Complete.===================")
 
+    if generation == MAX_GENERATIONS-1:
+        print("No solution found in ", MAX_GENERATIONS, "iterations.")
+        exit(0)
     # Extract the solution
     solution = min(population, key=lambda x: x['fitness'])
+    print("Solution found in generation ", generation)
     return solution['chromosome']
 
 # Run the genetic algorithm and print the solution
 solution = genetic_algorithm()
+
 print("===================Solution:===================")
 print("Chromosome: ", solution)
 print("Board: ")
