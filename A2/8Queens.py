@@ -1,5 +1,5 @@
 import random
-
+# weiners
 # Constants
 BOARD_SIZE = 8
 POPULATION_SIZE = 100
