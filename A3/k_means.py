@@ -1,61 +1,49 @@
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import random
+import matplotlib.pyplot as plt
 
-def kmeans(data, k, max_iterations=100):
-    # Step 1: Initialize centroids
-    centroids = data[:k]
 
-    for _ in range(max_iterations):
-        # Step 2: Assign each observation to the nearest centroid
-        labels = assign_labels(data, centroids)
+import numpy as np
+import random
 
-        # Step 3: Compute new centroids
-        new_centroids = compute_centroids(data, labels, k)
+# Step 1: Define the number of clusters (K) and max iterations
+K = 2
+max_iterations = 100
 
-        # Step 4: Check convergence
-        if np.all(centroids == new_centroids):
-            break
+# Step 2: Load the dataset
+df = pd.read_csv("kmeans.csv")
+data = df.values
 
-        centroids = new_centroids
+# Step 3: Initialize centroids randomly from the data points
+centroids = data[random.sample(range(len(data)), K)]
 
-    return labels
+# Step 4: Create an array to store the assigned cluster for each data point
+assignments = np.zeros(len(data))
 
-def assign_labels(data, centroids):
-    """
-    Assigns labels to each data point based on the nearest centroid.
+# Step 5: Implement the K-means algorithm
+for _ in range(max_iterations):
+    # Assign each data point to the nearest centroid
+    for i, point in enumerate(data):
+        distances = np.linalg.norm(centroids - point, axis=1)
+        assignments[i] = np.argmin(distances)
 
-    Args:
-        data (numpy.ndarray): Input data points.
-        centroids (list): Centroid positions.
+    # Update the centroids
+    for k in range(K):
+        cluster_points = data[assignments == k]
+        centroids[k] = np.mean(cluster_points, axis=0)
 
-    Returns:
-        list: Cluster labels for each data point.
-    """
-    labels = []
-    for point in data:
-        # Calculate distances between the data point and each centroid
-        distances = [np.linalg.norm(point - centroid) for centroid in centroids]
-        # Assign the label of the nearest centroid to the data point
-        label = np.argmin(distances)
-        labels.append(label)
-    return labels
+# Step 6: Print the results
+print("Centroids:")
+print(centroids)
+print("Cluster Assignments:")
+print(assignments)
 
-def compute_centroids(data, labels, k):
-    """
-    Computes new centroids by averaging the data points in each cluster.
-
-    Args:
-        data (numpy.ndarray): Input data points.
-        labels (list): Cluster labels for each data point.
-        k (int): Number of clusters.
-
-    Returns:
-        list: Updated centroid positions.
-    """
-    centroids = []
-    for i in range(k):
-        # Select the data points belonging to the current cluster
-        cluster_points = data[labels == i]
-        # Calculate the mean of the data points to obtain the new centroid position
-        centroid = np.mean(cluster_points, axis=0)
-        centroids.append(centroid)
-    return centroids
+# Step 7: Plot the results
+plt.scatter(data[:, 0], data[:, 1], c=assignments)
+plt.scatter(centroids[:, 0], centroids[:, 1], c='red', marker='x')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('K-means Clustering')
+plt.show()
