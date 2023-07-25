@@ -1,13 +1,9 @@
 import numpy as np
 import os
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Flatten
-from tensorflow.keras.layers import Conv2D, MaxPooling2D
-from tensorflow.keras.losses import categorical_crossentropy
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import load_model
+
+model = load_model('weights.h5')
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,28 +35,12 @@ test_generator = test_datagen.flow_from_directory(test_dir,
                                                   class_mode='categorical',
                                                   shuffle=False)
 
-
-model = Sequential()
-
-model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Flatten())
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(7, activation='softmax'))
-
-
-model.compile(loss='categorical_crossentropy',
-              optimizer=Adam(),
-              metrics=['accuracy'])
-
-
+# Continue training the model
 model.fit(train_generator,
-          steps_per_epoch=int(0.1*train_generator.n//train_generator.batch_size),
+          steps_per_epoch=int(train_generator.n//train_generator.batch_size),
           epochs=30,
           validation_data=test_generator,
           validation_steps=test_generator.n//test_generator.batch_size)
+
+# Save the model again after training
+model.save('weights.karas')
