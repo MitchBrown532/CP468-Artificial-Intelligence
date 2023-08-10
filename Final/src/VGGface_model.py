@@ -1,5 +1,7 @@
 import numpy as np
 import os
+import matplotlib.pyplot as plt
+
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.layers import Input, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model
@@ -61,7 +63,7 @@ test_generator = test_datagen.flow_from_directory(test_dir,
                                                   class_mode='categorical',
                                                   shuffle=False)
 
-emotion_model.fit(train_generator,
+history = emotion_model.fit(train_generator,
                   steps_per_epoch=int(train_generator.n // train_generator.batch_size),
                   epochs=30,
                   validation_data=test_generator,
@@ -70,4 +72,26 @@ emotion_model.fit(train_generator,
 loss, accuracy = emotion_model.evaluate(test_generator, steps=test_generator.n // test_generator.batch_size)
 print("Test accuracy:", accuracy)
 
-emotion_model.save('emotion_recognition_model.h5')
+emotion_model.save('vgg_weights.h5')
+
+
+# Plotting - These results should be saved and placed into figures
+# Plot training & validation loss values
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+# Plot training & validation accuracy values
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
