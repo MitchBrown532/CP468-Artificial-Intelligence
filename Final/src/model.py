@@ -52,7 +52,7 @@ history = model.fit(train_generator,
           validation_steps=test_generator.n//test_generator.batch_size)
 
 # Save the model again after training
-model.save('weights.karas')
+model.save('weights.keras')
 
 
 # Plotting - These results should be saved and placed into figures
@@ -64,7 +64,9 @@ plt.title('Model Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
+plt.savefig('loss_plot.png')
 plt.show()
+
 
 # Plot training & validation accuracy values
 plt.figure(figsize=(10, 6))
@@ -74,4 +76,5 @@ plt.title('Model Accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.legend()
+plt.savefig('accuracy_plot.png')
 plt.show()
