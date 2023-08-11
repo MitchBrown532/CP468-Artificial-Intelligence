@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import load_model
 from keras.models import load_model
@@ -15,7 +16,7 @@ keras_model = load_model('weights.h5')
 
 
 # Load VGGface Model
-vggface_model = VGGFace(model='resnet50', include_top=False, input_shape=(48, 48, 1), pooling='avg')
+vggface_model = tf.keras.applications.VGG16(input_shape=(48,48,3),include_top=False,weights="imagenet")
 vggface_model.load_weights('vgg_weights.h5')
 
 # Define input layers

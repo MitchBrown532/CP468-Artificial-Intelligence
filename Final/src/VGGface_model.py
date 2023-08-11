@@ -1,31 +1,50 @@
 import numpy as np
 import os
+import pandas as pd
 import matplotlib.pyplot as plt
-
+import seaborn as sn
+import skimage.io
+import keras.backend as K
+import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.layers import Input, Flatten, Dense, Dropout
-from tensorflow.keras.models import Model
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.layers import Dense, Flatten, Dropout,BatchNormalization ,Activation
+from tensorflow.keras.models import Model, Sequential
+from keras.applications.nasnet import NASNetLarge
+from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint, EarlyStopping
 from tensorflow.keras.optimizers import Adam
-from keras_vggface.vggface import VGGFace
+
+
 
 # Load VGGFace model and freeze its layers
-vggface_model = VGGFace(model='resnet50', include_top=False, input_shape=(48, 48, 1))
+base_model = tf.keras.applications.VGG16(input_shape=(48,48,3),include_top=False,weights="imagenet")
 
-for layer in vggface_model.layers:
+# Freeze some layers
+for layer in base_model.layers[:-4]:
     layer.trainable = False
 
-input_layer = Input(shape=(48, 48, 1))  
-vggface_features = vggface_model(input_layer)
+# Building Model
 
-flatten_layer = Flatten()(vggface_features)
-dense_layer = Dense(128, activation='relu')(flatten_layer)
-dropout_layer = Dropout(0.5)(dense_layer) 
-output_layer = Dense(7, activation='softmax')(dropout_layer)
+model=Sequential()
+model.add(base_model)
+model.add(Dropout(0.5))
+model.add(Flatten())
+model.add(BatchNormalization())
+model.add(Dense(32,kernel_initializer='he_uniform'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
+model.add(Dense(32,kernel_initializer='he_uniform'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
+model.add(Dense(32,kernel_initializer='he_uniform'))
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+model.add(Dense(7,activation='softmax'))
 
-emotion_model = Model(inputs=input_layer, outputs=output_layer)
-
-emotion_model.compile(optimizer=Adam(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
-
+model.summary()
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -45,11 +64,10 @@ train_datagen = ImageDataGenerator(rescale=1./255,
 
 
 # Define an ImageDataGenerator for normalization during testing
-test_datagen = ImageDataGenerator(rescale=1./255)
+test_datagen = ImageDataGenerator(rescale=1./255) 
 
 # Create a generator for loading and augmenting training data
 train_generator = train_datagen.flow_from_directory(train_dir,
-                                                    color_mode='grayscale',
                                                     target_size=(48,48),
                                                     batch_size=64,
                                                     class_mode='categorical',
@@ -57,22 +75,21 @@ train_generator = train_datagen.flow_from_directory(train_dir,
 
 # Create a generator for loading testing data
 test_generator = test_datagen.flow_from_directory(test_dir,
-                                                  color_mode='grayscale',
                                                   target_size=(48,48),
                                                   batch_size=64,
                                                   class_mode='categorical',
                                                   shuffle=False)
 
-history = emotion_model.fit(train_generator,
+history = model.fit(train_generator,
                   steps_per_epoch=int(train_generator.n // train_generator.batch_size),
                   epochs=30,
                   validation_data=test_generator,
                   validation_steps=test_generator.n // test_generator.batch_size)
 
-loss, accuracy = emotion_model.evaluate(test_generator, steps=test_generator.n // test_generator.batch_size)
+loss, accuracy = model.evaluate(test_generator, steps=test_generator.n // test_generator.batch_size)
 print("Test accuracy:", accuracy)
 
-emotion_model.save('vgg_weights.h5')
+model.save('vgg_weights.h5')
 
 
 # Plotting - These results should be saved and placed into figures
