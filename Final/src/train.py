@@ -1,5 +1,5 @@
-import numpy as np
 import os
+import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import load_model
 
@@ -36,7 +36,7 @@ test_generator = test_datagen.flow_from_directory(test_dir,
                                                   shuffle=False)
 
 # Continue training the model
-model.fit(train_generator,
+history = model.fit(train_generator,
           steps_per_epoch=int(train_generator.n//train_generator.batch_size),
           epochs=30,
           validation_data=test_generator,
@@ -45,4 +45,22 @@ model.fit(train_generator,
 # Save the model again after training
 model.save('weights.h5')
 
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+# Plot training & validation accuracy values
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
 
