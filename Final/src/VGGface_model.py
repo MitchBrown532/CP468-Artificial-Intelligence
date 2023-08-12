@@ -2,17 +2,10 @@ import numpy as np
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sn
-import skimage.io
-import keras.backend as K
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Dense, Flatten, Dropout,BatchNormalization ,Activation
 from tensorflow.keras.models import Model, Sequential
-from keras.applications.nasnet import NASNetLarge
-from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint, EarlyStopping
-from tensorflow.keras.optimizers import Adam
 
 
 
@@ -25,26 +18,65 @@ for layer in base_model.layers[:-4]:
 
 # Building Model
 
-model=Sequential()
+# Build a deeper model
+model = Sequential()
+
+# Add base model layers
 model.add(base_model)
-model.add(Dropout(0.5))
+
+# Batch Normalization before Activation
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
+# MaxPooling layer to reduce spatial dimensions
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Add a new Convolutional layer
+model.add(Conv2D(128, (3, 3), padding='same', kernel_initializer='he_uniform'))
+
+# Batch Normalization before Activation
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
+# MaxPooling layer
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Add another Convolutional layer
+model.add(Conv2D(256, (3, 3), padding='same', kernel_initializer='he_uniform'))
+
+# Batch Normalization before Activation
+model.add(BatchNormalization())
+model.add(Activation('relu'))
+
+# MaxPooling layer
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Flatten the output for fully connected layers
 model.add(Flatten())
-model.add(BatchNormalization())
-model.add(Dense(32,kernel_initializer='he_uniform'))
+
+# Fully connected layer with increased neurons
+model.add(Dense(128, kernel_initializer='he_uniform'))
+
+# Batch Normalization before Activation
 model.add(BatchNormalization())
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
-model.add(Dense(32,kernel_initializer='he_uniform'))
+
+# Another fully connected layer with reduced neurons
+model.add(Dense(64, kernel_initializer='he_uniform'))
+
+# Batch Normalization before Activation
 model.add(BatchNormalization())
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
-model.add(Dense(32,kernel_initializer='he_uniform'))
-model.add(BatchNormalization())
-model.add(Activation('relu'))
-model.add(Dense(7,activation='softmax'))
+
+# Output layer
+model.add(Dense(7, activation='softmax'))
 
 model.summary()
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+optimizer_1 = tf.keras.optimizers.RMSprop(learning_rate=0.001)
+model.compile(optimizer=optimizer_1, loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
