@@ -1,18 +1,10 @@
-import numpy as np
 import os
-import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sn
-import skimage.io
-import keras.backend as K
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Dense, Flatten, Dropout,BatchNormalization ,Activation
-from tensorflow.keras.models import Model, Sequential
-from keras.applications.nasnet import NASNetLarge
-from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint, EarlyStopping
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+
 
 
 
