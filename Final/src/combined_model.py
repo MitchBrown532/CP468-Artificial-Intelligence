@@ -7,8 +7,6 @@ from tensorflow.keras.models import load_model
 from keras.models import load_model
 from keras.models import Model
 from keras.layers import Input, concatenate, Dense, Dropout
-from keras_vggface.vggface import VGGFace
-from keras_vggface.utils import preprocess_input
 
 
 # Load Keras model
@@ -16,8 +14,8 @@ keras_model = load_model('weights.h5')
 
 
 # Load VGGface Model
-vggface_model = tf.keras.applications.VGG16(input_shape=(48,48,3),include_top=False,weights="imagenet")
-vggface_model.load_weights('vgg_weights.h5')
+vggface_model = load_model('vgg_weights.h5')
+
 
 # Define input layers
 keras_input = keras_model.input

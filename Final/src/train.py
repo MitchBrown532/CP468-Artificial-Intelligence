@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import load_model
 
-model = load_model('weights.h5')
+model_name = "vgg_weights.h5"
+
+model = load_model(model_name)
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,14 +24,12 @@ train_datagen = ImageDataGenerator(rescale=1./255,
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(train_dir,
-                                                    color_mode='grayscale',
                                                     target_size=(48,48),
                                                     batch_size=64,
                                                     class_mode='categorical',
                                                     shuffle=True)
 
 test_generator = test_datagen.flow_from_directory(test_dir,
-                                                  color_mode='grayscale',
                                                   target_size=(48,48),
                                                   batch_size=64,
                                                   class_mode='categorical',
@@ -37,13 +37,13 @@ test_generator = test_datagen.flow_from_directory(test_dir,
 
 # Continue training the model
 history = model.fit(train_generator,
-          steps_per_epoch=int(train_generator.n//train_generator.batch_size),
+          steps_per_epoch=int(0.1*train_generator.n//train_generator.batch_size),
           epochs=30,
           validation_data=test_generator,
           validation_steps=test_generator.n//test_generator.batch_size)
 
 # Save the model again after training
-model.save('weights.h5')
+model.save(model_name)
 
 plt.figure(figsize=(10, 6))
 plt.plot(history.history['loss'], label='Train Loss')

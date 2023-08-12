@@ -1,12 +1,8 @@
-import numpy as np
 import os
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
-from tensorflow.keras.losses import categorical_crossentropy
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 script_dir = os.path.dirname(os.path.abspath(__file__))

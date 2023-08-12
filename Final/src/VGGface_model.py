@@ -46,6 +46,7 @@ test_dir = os.path.join(script_dir, '../data/preprocessed/test')
 
 # Define an ImageDataGenerator for data augmentation and normalization during training
 train_datagen = ImageDataGenerator(rescale=1./255,
+                                   validation_split=0.2,
                                    rotation_range=30,
                                    width_shift_range=0.1,
                                    height_shift_range=0.1,
@@ -54,6 +55,8 @@ train_datagen = ImageDataGenerator(rescale=1./255,
                                    horizontal_flip=True,
                                    fill_mode='nearest')
 
+valid_datagen = ImageDataGenerator(rescale=1./255,
+                                   validation_split=0.2)
 
 # Define an ImageDataGenerator for normalization during testing
 test_datagen = ImageDataGenerator(rescale=1./255) 
